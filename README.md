@@ -1,11 +1,5 @@
-# WDD 430 | Team Project
+## Next.js App Router Course - Starter
 
-**Project Summary**
-This project creates an innovative website application called "Handcrafted Haven" that will be a platform for artisans and crafters to showcase and sell their unique handcrafted items. This will use HTML, CSS, JavaScript, and Next.js as Front-end technology and Node.js as Back-end.
+This is the starter template for the Next.js App Router Course. It contains the starting code for the dashboard application.
 
-**Group Members:**
-- Victor Jared Cruz Onato
-- Thomas Jordan Garcia
-- Aruzhan Abilmazhin
-- Ederson Luis Villalba Jimenez
-- Jared Samayoa Penagos
+For more information, see the [course curriculum](https://nextjs.org/learn) on the Next.js Website.
