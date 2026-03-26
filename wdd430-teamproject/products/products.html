@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products | Handcrafted Haven</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather&family=Roboto&display=swap" rel="stylesheet">
+  <script src="scripts/script.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="logo">Handcrafted Haven</div>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Open navigation menu">
+      ☰
+    </button>
+
+    <nav id="mainNav">
+      <a href="../index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="../cart.html">Cart</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      🌙
+    </button>
+  </header>
+
+  <main>
+    <section class="search-section fade-in">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search products..."
+        aria-label="Search products"
+      />
+    </section>
+
+    <section class="filter-section fade-in">
+      <label for="priceFilter">Filter by price:</label>
+      <select id="priceFilter">
+        <option value="all">All</option>
+        <option value="under20">Under $20</option>
+        <option value="under30">Under $30</option>
+        <option value="30andup">$30 and up</option>
+      </select>
+    </section>
+
+    <section class="page-title fade-in">
+      <h1>Our Products</h1>
+    </section>
+
+    <section class="product-list fade-in" id="productList">
+      <article class="product-card" data-name="wooden bowl" data-price="25">
+        <img src="images/product1.jpg" alt="Wooden bowl" />
+        <div class="product-info">
+          <h2>Wooden Bowl</h2>
+          <p>A handcrafted wooden bowl perfect for home décor or serving.</p>
+          <div class="rating" aria-label="4.8 out of 5 stars">★★★★★ <span>4.8</span></div>
+          <p class="price">$25.00</p>
+          <div class="button-group">
+            <a class="button" href="products-details.html?id=1">View Details</a>
+            <button class="button add-cart-btn" data-id="1">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="ceramic mug" data-price="18">
+        <img src="images/product2.jpg" alt="Ceramic mug" />
+        <div class="product-info">
+          <h2>Ceramic Mug</h2>
+          <p>A beautifully made ceramic mug for your favorite hot drink.</p>
+          <div class="rating" aria-label="4.7 out of 5 stars">★★★★★ <span>4.7</span></div>
+          <p class="price">$18.00</p>
+          <div class="button-group">
+            <a class="button" href="products-details.html?id=2">View Details</a>
+            <button class="button add-cart-btn" data-id="2">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card" data-name="handwoven basket" data-price="30">
+        <img src="images/product3.jpg" alt="Handwoven basket" />
+        <div class="product-info">
+          <h2>Handwoven Basket</h2>
+          <p>A natural woven basket great for storage and decoration.</p>
+          <div class="rating" aria-label="4.9 out of 5 stars">★★★★★ <span>4.9</span></div>
+          <p class="price">$30.00</p>
+          <div class="button-group">
+            <a class="button" href="products-details.html?id=3">View Details</a>
+            <button class="button add-cart-btn" data-id="3">Add to Cart</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Handcrafted Haven | All Rights Reserved</p>
+  </footer>
+</body>
+</html>
