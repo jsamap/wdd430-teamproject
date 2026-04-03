@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styles from '@/app/ui/home.module.css';
 import { roboto } from '@/app/ui/fonts';
 import Image from 'next/image';
+import CategoriesSection from '@/app/ui/CategoriesSection';
 
 export default function Page() {
   return (
@@ -20,6 +21,7 @@ export default function Page() {
         {/* </div> */}
         
       </div>
+      <CategoriesSection />
     </main>
   );
 }
