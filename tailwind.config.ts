@@ -8,9 +8,6 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      gridTemplateColumns: {
-        '13': 'repeat(13, minmax(0, 1fr))',
-      },
       colors: {
         hhblue: {
           300: '#9DBEFF',
@@ -26,6 +23,9 @@ const config: Config = {
           600: '#CE8003',
           700: '#b36f02',
         }
+      },
+      gridTemplateColumns: {
+        '13': 'repeat(13, minmax(0, 1fr))',
       },
     },
     keyframes: {
