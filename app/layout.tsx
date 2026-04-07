@@ -1,8 +1,5 @@
-// @ts-ignore
-import "./ui/global.css";
-import { roboto, merriweather } from "@/app/ui/fonts";
-import Navbar from "./ui/components/navbar";
-import Footer from "./ui/components/footer";
+import '@/app/ui/global.css';
+import { roboto, merriweather } from '@/app/ui/fonts';
 
 export default function RootLayout({
   children,
@@ -11,14 +8,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto.className} antialiased flex min-h-screen flex-col`}
-      >
-        <Navbar />
-
+      <body className={`${roboto.variable} ${merriweather.variable} font-sans antialiased`}>
         {children}
-        
-        <Footer />
       </body>
     </html>
   );
