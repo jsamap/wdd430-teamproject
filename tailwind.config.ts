@@ -17,7 +17,14 @@ const config: Config = {
           500: '#0070F3',
           600: '#2F6FEB',
         },
+        primary: '#6496FA',
+        secondary: '#FCB33D',
+        neutral: '#F7F7F7'
       },
+      fontFamily: {
+        sans: ['var(--font-roboto)'],
+        serif: ['var(--font-merriweather)'],
+      }
     },
     keyframes: {
       shimmer: {
