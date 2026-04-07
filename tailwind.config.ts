@@ -19,7 +19,21 @@ const config: Config = {
         },
         primary: '#6496FA',
         secondary: '#FCB33D',
-        neutral: '#F7F7F7'
+        neutral: '#F7F7F7',
+        hhblue: {
+          300: '#9DBEFF',
+          400: '#6496FA',
+          500: '#0858F7',
+          600: '#05389E',
+          700: '#032872',
+        },
+        hhorange: {
+          300: '#ffc76d',
+          400: '#FCB33D',
+          500: '#FB9C04',
+          600: '#CE8003',
+          700: '#b36f02',
+        }
       },
       fontFamily: {
         sans: ['var(--font-roboto)'],
