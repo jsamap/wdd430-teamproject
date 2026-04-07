@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ProfileCard from "@/components/profile/ProfileCard";
-import { getProfile } from "@/lib/profile-storage";
+import { getProfile } from "../../../lib/profile-storage";
 import type { Profile } from "@/lib/types";
 
 export default function ProfilePage() {

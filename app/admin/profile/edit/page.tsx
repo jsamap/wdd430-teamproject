@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ProfileForm from "@/components/profile/ProfileForm";
-import { getProfile, saveProfile } from "@/lib/profile-storage";
-import type { Profile } from "@/lib/types";
+import ProfileForm from "../../../../components/profile/ProfileForm";
+import { getProfile, saveProfile } from "../../../../lib/profile-storage";
 
 export default function EditProfilePage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -15,7 +14,7 @@ export default function EditProfilePage() {
     setProfile(profileData);
   }, []);
 
-  function handleSave(updatedProfile: Profile) {
+  function handleSave(updatedProfile: any) {
     saveProfile(updatedProfile);
     router.push("/admin/profile");
   }
@@ -26,7 +25,10 @@ export default function EditProfilePage() {
 
   return (
     <section>
-      <ProfileForm initialData={profile} onSave={handleSave} />
+      <ProfileForm
+        initialData={profile}
+        onSave={handleSave}
+      />
     </section>
   );
 }
