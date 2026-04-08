@@ -1,9 +1,9 @@
 import HhLogo from '@/app/ui/hh-logo';
 import { merriweather, roboto } from '@/app/ui/fonts';
-import { getProducts } from '@/app/lib/data/product.data';
+import { getFeaturedProducts } from '@/app/lib/data/product.data';
 
 export default async function Page() {
-  const products = await getProducts();
+  const products = await getFeaturedProducts();
 
   return (
     <main className="flex flex-grow flex-col p-0">
