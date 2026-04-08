@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"; // Force vercel to update data on every request.
+
 import HhLogo from '@/app/ui/hh-logo';
 import { merriweather, roboto } from '@/app/ui/fonts';
 import { getFeaturedProducts } from '@/app/lib/data/product.data';
