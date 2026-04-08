@@ -10,6 +10,16 @@ export async function getProducts() {
     }
 }
 
+export async function getFeaturedProducts() {
+    try {
+        const products = await sql`SELECT * FROM products ORDER BY RANDOM() ASC LIMIT 4`;
+        return products;
+    } catch (error) {
+        console.error('Failed to fetch products:', error);
+        throw new Error('Failed to fetch products.');
+    }
+}
+
 export async function getProduct(id: string) {
     try {
         const product = await sql`SELECT * FROM products WHERE id=${id}`;
