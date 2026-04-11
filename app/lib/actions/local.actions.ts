@@ -30,6 +30,20 @@ export type CartData = {
   shipping: number;
 };
 
+// Deliverable shape
+
+export type Deliverable = {
+  id: string;
+  items: CartItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  shipping: number;
+  totalItems: number;
+  createdAt: string;
+  status: "Pending" | "Shipped" | "Delivered";
+};
+
 //
 // Add to Cart
 //
@@ -188,5 +202,59 @@ export function updateCartQuantity(
       totalItems: 0,
       shipping: 0,
     };
+  }
+}
+
+export function placeOrderAndSaveDeliverable(): Deliverable[] {
+  try {
+    const storedCart = localStorage.getItem("cart");
+    const cart: CartItem[] = storedCart ? JSON.parse(storedCart) : [];
+
+    if (cart.length === 0) return [];
+
+    const subtotal = cart.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+    const taxRate = 0.077;
+    const tax = subtotal * taxRate;
+    const shipping = subtotal * 0.1;
+    const total = subtotal + tax + shipping;
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+    const newDeliverable: Deliverable = {
+      id: crypto.randomUUID(),
+      items: cart,
+      subtotal,
+      tax,
+      total,
+      shipping,
+      totalItems,
+      createdAt: new Date().toISOString(),
+      status: "Pending",
+    };
+
+    const storedDeliverables = localStorage.getItem("deliverables");
+    const deliverables: Deliverable[] = storedDeliverables
+      ? JSON.parse(storedDeliverables)
+      : [];
+    deliverables.push(newDeliverable);
+    localStorage.setItem("deliverables", JSON.stringify(deliverables));
+
+    localStorage.removeItem("cart");
+    return deliverables;
+  } catch (error) {
+    console.error("Failed to place order:", error);
+    return [];
+  }
+}
+
+export function getDeliverables(): Deliverable[] {
+  try {
+    const storedDeliverables = localStorage.getItem("deliverables");
+    return storedDeliverables ? JSON.parse(storedDeliverables) : [];
+  } catch (error) {
+    console.error("Failed to parse deliverables:", error);
+    return [];
   }
 }

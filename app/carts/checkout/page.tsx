@@ -5,7 +5,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CartData, clearCart, getCartTotalLocal } from "../../lib/actions/local.actions";
+import {
+  CartData,
+  placeOrderAndSaveDeliverable,
+  getCartTotalLocal,
+} from "../../lib/actions/local.actions";
 
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -34,7 +38,8 @@ export default function CheckoutPage() {
 
   const onSubmit = (data: FormData) => {
     console.log("Order placed:", data);
-    clearCart();
+    const deliverable = placeOrderAndSaveDeliverable();
+    console.log("Deliverable created:", deliverable);
     router.push("/carts/success");
   };
 

@@ -7,6 +7,7 @@ import {
   CartData,
   removeFromCart,
   updateCartQuantity,
+  getDeliverables,
 } from "../lib/actions/local.actions";
 
 export default function CartPage() {
@@ -26,6 +27,8 @@ export default function CartPage() {
       setCartData(data);
     }
   }, []);
+
+  const deliverables = getDeliverables();
 
   return (
     <main className="flex min-h-screen flex-col p-6">
@@ -75,7 +78,6 @@ export default function CartPage() {
                             }
                             className="px-2 py-0.1 bg-gray-200 rounded"
                           >
-                            
                             +
                           </button>
                         </div>
@@ -102,6 +104,35 @@ export default function CartPage() {
           >
             Continue Shopping
           </button>
+
+          <div className="p-6">
+            <h1 className="text-2xl font-bold mb-4">Deliverables</h1>
+            {deliverables.map((order) => (
+              <div key={order.id} className="border p-4 mb-6 rounded">
+                <p className="font-semibold">Order ID: {order.id}</p>
+                <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
+                <p>Status: {order.status}</p>
+                <p>Total: ${order.total.toFixed(2)}</p>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  {order.items.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div>
+                        <p>{item.name}</p>
+                        <p>
+                          ${item.price} × {item.quantity}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Order Summary */}
