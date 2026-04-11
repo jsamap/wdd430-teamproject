@@ -1,6 +1,11 @@
-import postgres from 'postgres';
+import postgres from "postgres";
 
-// We centralize the db connection instance
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const connectionString = process.env.POSTGRES_URL;
+
+if (!connectionString) {
+  throw new Error("POSTGRES_URL is not set.");
+}
+
+const sql = postgres(connectionString);
 
 export default sql;
