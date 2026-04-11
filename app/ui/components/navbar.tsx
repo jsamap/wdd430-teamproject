@@ -25,7 +25,9 @@ export default function Navbar() {
         <nav className="bg-black p-4">
             <div className="flex items-center justify-between">
                 {/* Logo on the left */}
-                <HhLogo />
+                <Link href="/">
+                    <HhLogo />
+                </Link>
 
                 {/* Hamburger toggle (mobile only) */}
                 <button

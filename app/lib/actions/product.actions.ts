@@ -3,7 +3,6 @@
 import { z } from "zod";
 import sql from "@/app/lib/db/postgres";
 
-
 const FormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -53,4 +52,32 @@ export async function deleteProduct(prevState: any, productId: string) {
   return { product: result[0] };
 }
 
+const CartSchema = z.object({
+  productId: z.string().uuid("Invalid product ID"),
+  quantity: z.number().int().positive("Quantity must be positive"),
+});
+
+export async function addToCart(prevState: any, formData: FormData) {
+  const validatedFields = CartSchema.safeParse({
+    productId: formData.get("productId"),
+    quantity: parseInt(formData.get("quantity") as string, 10),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Missing or Invalid Fields. Failed to Add to Cart.",
+    };
+  }
+
+  const { productId, quantity } = validatedFields.data;
+
+  const result = await sql`
+    INSERT INTO cart_items (product_id, quantity)
+    VALUES (${productId}, ${quantity})
+    RETURNING *;
+  `;
+
+  return { cartItem: result[0], message: "Item added to cart successfully." };
+}
 

@@ -13,7 +13,7 @@ export default function SuccessPage() {
         </p>
         <Link
           href={`/`}
-          className="mt-6 inline-block bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+          className="mt-6 inline-block bg-hhblue-600 text-white px-6 py-2 rounded-md hover:bg-hhorange-700 transition"
         >
           Back to Home
         </Link>

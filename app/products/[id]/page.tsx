@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { use, useState } from "react";
+import { addToCartLocal } from "@/app/lib/actions/local.actions";
 
 const products = [
  {
@@ -12,7 +13,8 @@ const products = [
     price: 28,
     rating: 4.9,
     image: "/images/homedecor1.png",
-    description: "A handcrafted rustic wooden wall sign perfect for cozy spaces.",
+    description:
+      "A handcrafted rustic wooden wall sign perfect for cozy spaces.",
   },
   {
     id: "2",
@@ -455,40 +457,9 @@ export default function ProductDetail({
           : "min-h-screen bg-[#F7F7F7] text-black"
       }
     >
-      <header
-        className={
-          darkMode
-            ? "sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 bg-black px-8 py-4 text-white shadow-md"
-            : "sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 bg-[#6496FA] px-8 py-4 text-white shadow-md"
-        }
-      >
-        <Image
-          src="/images/hh-logo.png"
-          alt="Handcrafted Haven Logo"
-          width={180}
-          height={50}
-          loading="eager"
-          style={{ width: "180px", height: "auto" }}
-        />
-
-        <div className="flex items-center gap-4">
-          <Link href="/products" className="font-bold hover:underline">
-            ← Back to Products
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => setDarkMode((prev) => !prev)}
-            className="rounded-md bg-[#FCB33D] px-4 py-2 font-bold text-black"
-          >
-            {darkMode ? "Light Mode" : "Dark Mode"}
-          </button>
-        </div>
-      </header>
-
       <section className="flex flex-col gap-8 px-8 py-8 md:flex-row">
         <div className="w-full md:w-1/2">
-         <Image
+          <Image
             src={product.image}
             alt={product.name}
             width={500}
@@ -520,22 +491,13 @@ export default function ProductDetail({
 
           <button
             type="button"
+            onClick={() => addToCartLocal(product, 1)}
             className="rounded-md bg-[#FCB33D] px-6 py-3 font-bold text-black"
           >
             Add to Cart
           </button>
         </div>
       </section>
-
-      <footer
-        className={
-          darkMode
-            ? "mt-8 bg-black px-4 py-4 text-center text-white"
-            : "mt-8 bg-[#6496FA] px-4 py-4 text-center text-white"
-        }
-      >
-        <p>&copy; 2026 Handcrafted Haven | All Rights Reserved</p>
-      </footer>
     </main>
   );
 }
