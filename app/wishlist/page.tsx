@@ -3,6 +3,7 @@ import { getProductsInWishlist } from "@/app/lib/data/wishlist.data";
 import WishlistItems from "@/app/ui/components/WishlistItems";
 import { merriweather } from "@/app/ui/fonts";
 
+
 export default async function Page() {
   const session = await auth();
 
