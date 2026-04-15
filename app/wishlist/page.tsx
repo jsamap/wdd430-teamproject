@@ -23,7 +23,7 @@ export default async function Page() {
 
   return (
     <main className="flex flex-grow flex-col p-0 bg-neutral">
-      <h1 className="text-4xl font-bold px-8 py-6">Your Wishlist</h1>
+      <h1 className="text-4xl font-bold px-8 py-6">Your Wishlist ❤️🛍️</h1>
       <WishlistItems initialItems={items} />
     </main>
   );

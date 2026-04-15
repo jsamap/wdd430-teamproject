@@ -8,10 +8,17 @@ import { getLatestReviews } from '@/app/lib/data/review.data';
 import { StarIcon } from "@heroicons/react/24/solid";
 import Image from 'next/image';
 import { SessionProvider } from "next-auth/react";
+import { auth } from "@/auth";
+
 
 export default async function Page() {
   const featuredProducts = await getFeaturedProducts();
   const latestReviews = await getLatestReviews();
+  const session = await auth();
+  let user_name;
+  if (session?.user) {
+    user_name = session.user.name;
+  }
 
   return (
     <SessionProvider>
@@ -19,7 +26,7 @@ export default async function Page() {
       <main className="flex flex-grow flex-col p-0 bg-neutral">
 
         <section className="flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-hhblue-700 to-hhblue-400 text-white">
-          <h1 className={`${merriweather.className} text-5xl font-bold`}>Welcome</h1>
+          <h1 className={`${merriweather.className} text-5xl font-bold`}>Welcome {user_name}</h1>
           <p className="mt-4 text-lg">Discover Treasures, Support Artisans.</p>
           <a href="/products" className="mt-6 px-6 py-3 bg-white text-hhblue-500 font-semibold rounded-lg shadow hover:bg-hhorange-300 hover:text-black">
             Shop Now
