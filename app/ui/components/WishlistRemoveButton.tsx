@@ -7,7 +7,7 @@ type WishlistButtonProps = {
   productId: string;
 };
 
-export default function WishlistButton({ productId }: WishlistButtonProps) {
+export default function WishlistRemoveButton({ productId }: WishlistButtonProps) {
   const router = useRouter();
 
   const removeFromWishlist = async () => {
@@ -19,7 +19,7 @@ export default function WishlistButton({ productId }: WishlistButtonProps) {
       });
 
       if (res.ok) {
-        router.refresh(); // ✅ re-fetch server component data
+        router.refresh();
       } else {
         console.error("Remove from wishlist failed:", await res.text());
       }

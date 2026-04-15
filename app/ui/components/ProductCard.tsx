@@ -6,7 +6,7 @@ import { HeartIcon } from "@heroicons/react/24/solid";
 import { useState, useEffect } from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutline } from "@heroicons/react/24/outline";
-import { useSession } from "next-auth/react"; // ✅ import session hook
+import { useSession } from "next-auth/react";
 
 interface ProductCardProps {
   id: string;
@@ -78,7 +78,6 @@ export default function ProductCard({ id, name, seller, price, image, rating }: 
           className="object-cover w-full h-full rounded transition duration-300 hover:opacity-90 aspect-square"
         />
 
-        {/* Wishlist toggle button only if logged in */}
         {session?.user && (
           <button
             onClick={toggleWishlist}
