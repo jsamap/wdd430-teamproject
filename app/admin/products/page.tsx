@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ProductTable from "../../../components/products/ProductTable";
+import ProductTable from "../../ui/components/products/ProductTable";
 import { getProducts, saveProducts } from "../../../lib/product-storage";
 
 export default function ProductsPage() {
