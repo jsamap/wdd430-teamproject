@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ProfileCard from "@/components/profile/ProfileCard";
+import ProfileCard from "@/app/ui/components/profile/ProfileCard";
 import { getProfile } from "../../../lib/profile-storage";
 import type { Profile } from "@/lib/types";
 
