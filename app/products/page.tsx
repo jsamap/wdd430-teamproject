@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { addToCartLocal } from "@/app/lib/actions/local.actions";
 import { useTransition } from "react";
+import { flyToCart } from "../ui/animation/animation";
 
 const products = [
   {
@@ -476,8 +477,6 @@ export default function ProductsPage() {
     });
   }, [searchTerm, priceFilter, selectedCategory]);
 
- 
-
   return (
     <main
       className={
@@ -563,6 +562,7 @@ export default function ProductsPage() {
               }
             >
               <Image
+                id={`product-image-${product.id}`}
                 src={product.image}
                 alt={product.name}
                 width={180}
@@ -598,6 +598,14 @@ export default function ProductsPage() {
                   <button
                     type="button"
                     onClick={() => {
+                      const imageEl = document.getElementById(
+                        `product-image-${product.id}`,
+                      ) as HTMLImageElement;
+                      const cartIconEl = document.getElementById("cart-icon");
+
+                      if (imageEl && cartIconEl) {
+                        flyToCart(imageEl, cartIconEl);
+                      }
                       addToCartLocal(product, 1);
                     }}
                     disabled={isPending}
