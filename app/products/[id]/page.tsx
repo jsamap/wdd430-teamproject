@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { use, useState } from "react";
 import { addToCartLocal } from "@/app/lib/actions/local.actions";
+import { flyToCart } from "@/app/ui/animation/animation";
 
 const products = [
- {
+  {
     id: "1",
     name: "Rustic Wall Sign",
     category: "Home Decor",
@@ -460,6 +461,7 @@ export default function ProductDetail({
       <section className="flex flex-col gap-8 px-8 py-8 md:flex-row">
         <div className="w-full md:w-1/2">
           <Image
+            id={`product-image-${product.id}`}
             src={product.image}
             alt={product.name}
             width={500}
@@ -488,14 +490,32 @@ export default function ProductDetail({
           <p className="mb-6 text-2xl font-bold text-[#FCB33D]">
             ${product.price.toFixed(2)}
           </p>
+          <div className="flex gap-4">
+            {" "}
+            <Link
+              href="/products"
+              className="rounded-md bg-[#FCB33D] px-6 py-3 font-bold text-black inline-block"
+            >
+              Back to Products
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                const imageEl = document.getElementById(
+                  `product-image-${product.id}`,
+                ) as HTMLImageElement;
+                const cartIconEl = document.getElementById("cart-icon");
 
-          <button
-            type="button"
-            onClick={() => addToCartLocal(product, 1)}
-            className="rounded-md bg-[#FCB33D] px-6 py-3 font-bold text-black"
-          >
-            Add to Cart
-          </button>
+                if (imageEl && cartIconEl) {
+                  flyToCart(imageEl, cartIconEl);
+                }
+                addToCartLocal(product, 1);
+              }}
+              className="rounded-md bg-[#FCB33D] px-6 py-3 font-bold text-black"
+            >
+              Add to Cart
+            </button>
+          </div>
         </div>
       </section>
     </main>
