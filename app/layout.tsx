@@ -1,7 +1,7 @@
 import '@/app/ui/global.css';
 import { roboto } from '@/app/ui/fonts';
-import Navbar from "@/app/ui/components/Navbar";
-import Footer from "@/app/ui/components/Footer";
+import Navbar from "@/app/ui/components/NavbarMain";
+import Footer from "@/app/ui/components/FooterMain";
 
 export default function RootLayout({
   children,
