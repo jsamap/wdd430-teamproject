@@ -6,7 +6,7 @@ export default function HhLogo() {
       className={`${merriweather.className} flex flex-row items-center gap-4 leading-none text-white`}
     >
       <img className="h-20 w-20" src="/images/hh-logo.png" alt="Handcrafted Haven Logo" />
-      <p className="text-[44px]">Handcrafted Haven</p>
+      <p className="text-[36px]">Handcrafted Haven</p>
     </div>
   );
 }
