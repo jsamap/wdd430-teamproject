@@ -1,14 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import HhLogo from "@/app/ui/hh-logo";
 import { usePathname } from "next/navigation";
 import { UserIcon, ShoppingCartIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
+
 export default function Navbar() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
+    const cartIconRef = useRef<HTMLAnchorElement>(null);
+
 
     const navItems = [
         { href: "/", label: "Home" },
@@ -66,11 +69,13 @@ export default function Navbar() {
                         <ul className="flex space-x-2 text-white font-medium">
                             {navIcons.map((item) => {
                                 const Icon = item.icon;
+                                const isCart = item.href === "/carts";
                                 return (
                                     <li key={item.href}>
                                         <Link
                                             href={item.href}
-                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-400 flex items-center justify-center h-10 w-10"
+                                            id={isCart ? "cart-icon" : undefined}
+                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
                                         >
                                             <Icon className="h-6 w-6" />
                                         </Link>
@@ -111,11 +116,13 @@ export default function Navbar() {
                         <ul className="flex space-x-2 justify-end text-white font-medium">
                             {navIcons.map((item) => {
                                 const Icon = item.icon;
+                                const isCart = item.href === "/carts";  
                                 return (
                                     <li key={item.href}>
                                         <Link
                                             href={item.href}
-                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-400 flex items-center justify-center h-10 w-10"
+                                            id={isCart ? "cart-icon" : undefined}
+                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
                                         >
                                             <Icon className="h-6 w-6" />
                                         </Link>
