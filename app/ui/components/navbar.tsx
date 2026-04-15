@@ -70,7 +70,7 @@ export default function Navbar() {
                                     <li key={item.href}>
                                         <Link
                                             href={item.href}
-                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
+                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-400 flex items-center justify-center h-10 w-10"
                                         >
                                             <Icon className="h-6 w-6" />
                                         </Link>
@@ -115,7 +115,7 @@ export default function Navbar() {
                                     <li key={item.href}>
                                         <Link
                                             href={item.href}
-                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
+                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-400 flex items-center justify-center h-10 w-10"
                                         >
                                             <Icon className="h-6 w-6" />
                                         </Link>
