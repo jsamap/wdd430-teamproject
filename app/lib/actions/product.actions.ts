@@ -3,7 +3,6 @@
 import { z } from "zod";
 import sql from "@/app/lib/db/postgres";
 
-
 const FormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -28,11 +27,11 @@ export async function createProduct(prevState: any, formData: FormData) {
 
   const { name, description, price, imageUrl } = validatedFields.data;
 
-  const result = await sql`
-      INSERT INTO products (name, description, price, image_url)
-      VALUES (${name}, ${description}, ${price}, ${imageUrl})
-      RETURNING *;
-    `;
+ const result = await sql`
+  INSERT INTO products (name, description, price, image)
+  VALUES (${name}, ${description}, ${price}, ${imageUrl})
+  RETURNING *;
+`;
 
   return { product: result[0] };
 }
@@ -53,4 +52,35 @@ export async function deleteProduct(prevState: any, productId: string) {
   return { product: result[0] };
 }
 
+export async function getProducts() {
+  const result = await sql`
+    SELECT
+      id,
+      name,
+      description,
+      price,
+      image,
+      category
+    FROM products
+    ORDER BY name ASC;
+  `;
 
+  return result;
+}
+
+export async function getProductById(productId: string) {
+  const result = await sql`
+    SELECT
+      id,
+      name,
+      description,
+      price,
+      image,
+      category
+    FROM products
+    WHERE id = ${productId}
+    LIMIT 1;
+  `;
+
+  return result[0] || null;
+}
