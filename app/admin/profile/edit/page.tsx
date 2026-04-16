@@ -1,86 +1,123 @@
-import { NextResponse } from "next/server";
-import sql from "@/app/lib/db/postgres";
-import { auth } from "@/auth";
+"use client";
 
-export async function GET() {
-  try {
-    const session = await auth();
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+type ProfileFormData = {
+  name: string;
+  email: string;
+};
+
+export default function EditProfilePage() {
+  const [formData, setFormData] = useState<ProfileFormData>({
+    name: "",
+    email: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const res = await fetch("/api/users/me", {
+          cache: "no-store",
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+
+        const user = await res.json();
+
+        setFormData({
+          name: user.name ?? "",
+          email: user.email ?? "",
+        });
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    const user = await sql`
-      SELECT id, name, email, role
-      FROM users
-      WHERE email = ${session.user.email};
-    `;
+    loadProfile();
+  }, []);
 
-    if (user.length === 0) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
-    }
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
 
-    return NextResponse.json(user[0], { status: 200 });
-  } catch (error) {
-    console.error("GET /api/users/me error:", error);
-
-    return NextResponse.json(
-      { message: "Failed to fetch profile" },
-      { status: 500 }
-    );
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   }
-}
 
-export async function PUT(request: Request) {
-  try {
-    const session = await auth();
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+    try {
+      const res = await fetch("/api/users/me", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      router.push("/admin/profile");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to save profile:", error);
+      alert("Failed to update profile");
     }
-
-    const body = await request.json();
-    const { name, email } = body;
-
-    if (!name || !email) {
-      return NextResponse.json(
-        { message: "Name and email are required" },
-        { status: 400 }
-      );
-    }
-
-    const updated = await sql`
-      UPDATE users
-      SET
-        name = ${name},
-        email = ${email}
-      WHERE email = ${session.user.email}
-      RETURNING id, name, email, role;
-    `;
-
-    if (updated.length === 0) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json(updated[0], { status: 200 });
-  } catch (error) {
-    console.error("PUT /api/users/me error:", error);
-
-    return NextResponse.json(
-      { message: "Failed to update profile" },
-      { status: 500 }
-    );
   }
+
+  if (loading) {
+    return <div className="p-6">Loading form...</div>;
+  }
+
+  return (
+    <section className="space-y-6 p-6">
+      <h2 className="text-2xl font-semibold">Edit Profile</h2>
+
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-xl space-y-4 rounded-2xl border bg-white p-6 shadow-sm"
+      >
+        <div>
+          <label className="mb-1 block font-medium">Name</label>
+          <input
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full rounded-lg border p-3"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block font-medium">Email</label>
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full rounded-lg border p-3"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="rounded-lg bg-black px-5 py-3 text-white"
+        >
+          Save Changes
+        </button>
+      </form>
+    </section>
+  );
 }

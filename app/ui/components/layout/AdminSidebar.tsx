@@ -39,6 +39,17 @@ export default function AdminSidebar() {
         >
           Products
         </Link>
+
+        <Link
+          href="/admin/users"
+          className={`block rounded-lg px-4 py-3 ${
+            isActive("/admin/users")
+              ? "bg-black text-white"
+              : "text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          Users
+        </Link>
       </nav>
     </aside>
   );
