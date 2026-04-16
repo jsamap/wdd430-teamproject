@@ -10,7 +10,7 @@ const checkoutSchema = z.object({
   address: z.string().min(5, "Address is required"),
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
-  zip: z.string().regex(/^\d{4}$/, "ZIP must be 5 digits"),
+  zip: z.string().regex(/^\d{4}$/, "ZIP must be 4 digits"),
   cardNumber: z.string().regex(/^\d{16}$/, "Card number must be 16 digits"),
   expiry: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Format MM/YY"),
   cvv: z.string().regex(/^\d{3}$/, "CVV must be 3 digits"),
