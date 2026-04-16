@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import sql from "@/app/lib/db/postgres";
+import { auth } from "@/auth";
+
+function unauthorized() {
+  return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+}
 
 type ProductBody = {
   name: string;
@@ -49,6 +54,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth();
+    if ((session?.user as { role?: string })?.role !== "admin") {
+      return unauthorized();
+    }
+
     const { id } = await params;
     const body = (await request.json()) as ProductBody;
 
@@ -154,6 +164,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await auth();
+    if ((session?.user as { role?: string })?.role !== "admin") {
+      return unauthorized();
+    }
+
     const { id } = await params;
 
     const deleted = await sql`

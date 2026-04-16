@@ -61,6 +61,9 @@ export default function EditProductPage() {
         }),
       });
 
+      if (response.status === 401) {
+        throw new Error("You must be logged in as an admin to update products.");
+      }
       if (!response.ok) {
         throw new Error("Failed to update product");
       }

@@ -102,13 +102,15 @@ export default function UsersPage() {
                       >
                         Edit
                       </Link>
-                      <button
+                      {user.role !== "admin" && (
+                        <button
                         type="button"
                         onClick={() => handleDelete(user.id)}
                         className="rounded-md bg-red-600 px-3 py-1 text-white"
                       >
                         Delete
                       </button>
+                      )}
                     </div>
                   </td>
                 </tr>

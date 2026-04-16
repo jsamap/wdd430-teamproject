@@ -22,7 +22,10 @@ export default async function ProductDetail({
         <section className="flex flex-col items-center gap-6 md:flex-row md:items-start">
           <div className="w-full md:w-1/2">
             <Image
-              src={product.image}
+              src={
+                product.image ??
+                "https://i.ibb.co/gMsLBjDv/terracota-plant-pot.webp"
+              }
               alt={product.name}
               width={500}
               height={500}
@@ -33,6 +36,18 @@ export default async function ProductDetail({
 
           <div className="flex w-full flex-col gap-3 rounded-xl bg-white p-6 shadow-[0_2px_8px_rgba(0,0,0,0.1)] md:w-1/2">
             <h1 className="font-serif text-4xl font-bold">{product.name}</h1>
+
+            {product.user_id && (
+              <p className="text-sm text-gray-600">
+                Sold by{" "}
+                <Link
+                  href={`/sellers/${product.user_id}`}
+                  className="font-medium text-[#6496FA] hover:underline"
+                >
+                  {product.seller_name ?? "this artisan"}
+                </Link>
+              </p>
+            )}
 
             <div className="font-bold text-[#FCB33D]">
               <ReviewRating rating={product.rating_average} count={product.rating_count} />
