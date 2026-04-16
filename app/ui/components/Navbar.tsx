@@ -1,169 +1,201 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import HhLogo from "@/app/ui/hh-logo";
 import { usePathname } from "next/navigation";
 import {
-    UserIcon,
-    ShoppingCartIcon,
-    Bars3Icon,
-    XMarkIcon,
-    ArrowRightOnRectangleIcon,
+  UserIcon,
+  ShoppingCartIcon,
+  Bars3Icon,
+  XMarkIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { signOut, useSession } from "next-auth/react";
 
+const LOGIN_PATH = "/auth/login";
+
 export default function Navbar() {
-    const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(false);
-    const cartIconRef = useRef<HTMLAnchorElement>(null);
-    const { data: session } = useSession();
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const role = (session?.user as { role?: string })?.role;
+  const isLoggedIn = status === "authenticated" && !!session?.user;
 
-    const navItems = [
-        { href: "/", label: "Home" },
-        { href: "/products", label: "Products" },
-        { href: "/wishlist", label: "Wishlist" },
-    ];
+  /** Profile / account icon destination by role (buyers cannot use /admin routes). */
+  const profileHref = !isLoggedIn
+    ? LOGIN_PATH
+    : role === "admin"
+      ? "/admin"
+      : role === "seller"
+        ? "/seller/profile"
+        : "/wishlist";
 
-    const navIcons = [
-        { href: "/carts", icon: ShoppingCartIcon },
-        { href: "/admin/profile", icon: UserIcon },
-    ];
+  const navItems = [
+    { href: "/", label: "Home" },
+    { href: "/products", label: "Products" },
+    ...(role === "admin" ? [{ href: "/admin", label: "Admin" }] : []),
+    ...(role === "seller" ? [{ href: "/seller", label: "Seller area" }] : []),
+    { href: "/wishlist", label: "Wishlist" },
+  ];
 
-    return (
-        <nav className="bg-black p-4">
-            <div className="flex items-center justify-between">
-                {/* Logo */}
-                <Link href="/">
-                    <HhLogo />
-                </Link>
+  const navIcons = [
+    { href: "/carts", icon: ShoppingCartIcon, label: "Cart" },
+    { href: profileHref, icon: UserIcon, label: "Account" },
+  ];
 
-                {/* Hamburger toggle */}
-                <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="text-white md:hidden"
+  async function handleSignOut() {
+    setIsOpen(false);
+    await signOut({ callbackUrl: LOGIN_PATH });
+  }
+
+  return (
+    <nav className="bg-black p-4">
+      <div className="flex items-center justify-between gap-3">
+        <Link href="/" className="shrink-0">
+          <HhLogo />
+        </Link>
+
+        {/* Mobile: cart, account, auth, menu */}
+        <div className="flex items-center gap-2 md:hidden">
+          {navIcons.map((item) => {
+            const Icon = item.icon;
+            const isCart = item.href === "/carts";
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-label={item.label}
+                id={isCart ? "cart-icon" : undefined}
+                className="flex h-10 w-10 items-center justify-center rounded bg-hhorange-300 text-black hover:bg-hhorange-500"
+              >
+                <Icon className="h-6 w-6" />
+              </Link>
+            );
+          })}
+          {isLoggedIn && (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex h-10 w-10 items-center justify-center rounded bg-hhorange-300 text-black hover:bg-hhorange-500"
+              aria-label="Log out"
+            >
+              <ArrowRightOnRectangleIcon className="h-6 w-6" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="flex h-10 w-10 items-center justify-center rounded text-white md:hidden"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+          >
+            {isOpen ? <XMarkIcon className="h-6 w-6" /> : <Bars3Icon className="h-6 w-6" />}
+          </button>
+        </div>
+
+        {/* Desktop */}
+              <div className="hidden md:flex items-center space-x-8">
+          <ul className="flex space-x-6 text-white font-medium">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={
+                    pathname === item.href
+                      ? "border-b-2 border-hhorange-300"
+                      : "hover:text-hhorange-300"
+                  }
                 >
-                    {isOpen ? (
-                        <XMarkIcon className="h-6 w-6" />
-                    ) : (
-                        <Bars3Icon className="h-6 w-6" />
-                    )}
-                </button>
-
-                {/* Desktop nav */}
-                <div className="hidden md:flex items-center space-x-8">
-                    <ul className="flex space-x-6 text-white font-medium">
-                        {navItems.map((item) => (
-                            <li key={item.href}>
-                                <Link
-                                    href={item.href}
-                                    className={
-                                        pathname === item.href
-                                            ? "border-b-2 border-hhorange-300"
-                                            : "hover:text-hhorange-300"
-                                    }
-                                >
-                                    {item.label}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-
-                    {/* Icons */}
-                    <div className="flex space-x-2">
-                        <ul className="flex space-x-2 text-white font-medium">
-                            {navIcons.map((item) => {
-                                const Icon = item.icon;
-                                const isCart = item.href === "/carts";
-                                return (
-                                    <li key={item.href}>
-                                        <Link
-                                            href={item.href}
-                                            id={isCart ? "cart-icon" : undefined}
-                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
-                                        >
-                                            <Icon className="h-6 w-6" />
-                                        </Link>
-                                    </li>
-                                );
-                            })}
-
-                            {/* Logout button only if authenticated */}
-                            {session && (
-                                <li>
-                                    <button
-                                        onClick={() => signOut()}
-                                        className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
-                                        aria-label="Logout"
-                                    >
-                                        <ArrowRightOnRectangleIcon className="h-6 w-6" />
-                                    </button>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            {/* Mobile nav dropdown */}
-            {isOpen && (
-                <div className="md:hidden mt-4">
-                    <ul className="flex flex-col space-y-2 text-white font-medium">
-                        {navItems.map((item) => (
-                            <li key={item.href}>
-                                <Link
-                                    href={item.href}
-                                    className={
-                                        pathname === item.href
-                                            ? "flex justify-center px-2 py-1 rounded bg-hhblue-300 text-black"
-                                            : "flex justify-center px-2 py-1 rounded hover:bg-hhorange-300 hover:text-black"
-                                    }
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    {item.label}
-                                </Link>
-                            </li>
-                        ))}
-                    </ul>
-
-                    {/* Mobile icons */}
-                    <div className="flex space-x-2 mt-4 justify-end">
-                        <ul className="flex space-x-2 justify-end text-white font-medium">
-                            {navIcons.map((item) => {
-                                const Icon = item.icon;
-                                const isCart = item.href === "/carts";
-                                return (
-                                    <li key={item.href}>
-                                        <Link
-                                            href={item.href}
-                                            id={isCart ? "cart-icon" : undefined}
-                                            className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
-                                        >
-                                            <Icon className="h-6 w-6" />
-                                        </Link>
-                                    </li>
-                                );
-                            })}
-
-                            {/* Logout button only if authenticated */}
-                            {session && (
-                                <li>
-                                    <button
-                                        onClick={() => {
-                                            setIsOpen(false);
-                                            signOut();
-                                        }}
-                                        className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
-                                        aria-label="Logout"
-                                    >
-                                        <ArrowRightOnRectangleIcon className="h-6 w-6" />
-                                    </button>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                </div>
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            {!isLoggedIn && (
+              <li>
+                <Link href="/auth/register" className="hover:text-hhorange-300">
+                  Register
+                </Link>
+              </li>
             )}
-        </nav>
-    );
+          </ul>
+
+          <ul className="flex items-center gap-2">
+            {navIcons.map((item) => {
+              const Icon = item.icon;
+              const isCart = item.href === "/carts";
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    id={isCart ? "cart-icon-desktop" : undefined}
+                    aria-label={item.label}
+                    className="flex h-10 w-10 items-center justify-center rounded bg-hhorange-300 text-black hover:bg-hhorange-500"
+                  >
+                    <Icon className="h-6 w-6" />
+                  </Link>
+                </li>
+              );
+            })}
+            {isLoggedIn && (
+              <li>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="flex h-10 w-10 items-center justify-center rounded bg-hhorange-300 text-black hover:bg-hhorange-500"
+                  aria-label="Log out"
+                >
+                  <ArrowRightOnRectangleIcon className="h-6 w-6" />
+                </button>
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+
+      {/* Mobile dropdown: extra links + register */}
+      {isOpen && (
+        <div className="mt-4 border-t border-gray-700 pt-4 md:hidden">
+          <ul className="flex flex-col gap-2 text-center text-white">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={
+                    pathname === item.href
+                      ? "block rounded bg-hhblue-300 px-3 py-2 text-black"
+                      : "block rounded px-3 py-2 hover:bg-hhorange-300 hover:text-black"
+                  }
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            {!isLoggedIn && (
+              <li>
+                <Link
+                  href="/auth/register"
+                  className="block rounded px-3 py-2 hover:bg-hhorange-300 hover:text-black"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Register
+                </Link>
+              </li>
+            )}
+            {isLoggedIn && (
+              <li>
+                <button
+                  type="button"
+                  className="mx-auto mt-2 block w-full max-w-xs rounded bg-hhorange-300 px-4 py-2 font-medium text-black"
+                  onClick={handleSignOut}
+                >
+                  Log out
+                </button>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+    </nav>
+  );
 }

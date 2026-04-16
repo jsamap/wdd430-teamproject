@@ -6,10 +6,9 @@ import ProductCard from "@/app/ui/components/ProductCard";
 import { getFeaturedProducts } from '@/app/lib/data/product.data';
 import { getLatestReviews } from '@/app/lib/data/review.data';
 import { StarIcon } from "@heroicons/react/24/solid";
-import Image from 'next/image';
-import { SessionProvider } from "next-auth/react";
+import Image from "next/image";
 import { auth } from "@/auth";
-import ReviewRating from './ui/reviews/ReviewRating';
+import ReviewRating from "./ui/reviews/ReviewRating";
 
 
 export default async function Page() {
@@ -22,8 +21,6 @@ export default async function Page() {
   }
 
   return (
-    <SessionProvider>
-
       <main className="flex flex-grow flex-col p-0 bg-neutral">
 
         <section className="flex flex-col items-center justify-center text-center py-20 bg-gradient-to-b from-hhblue-700 to-hhblue-400 text-white">
@@ -42,9 +39,9 @@ export default async function Page() {
                 key={product.id}
                 id={product.id}
                 name={product.name}
-                seller={product.seller_name}
+                seller={product.seller_name ?? "Artisan"}
                 price={product.price}
-                image={product.image}
+                image={product.image ?? "https://i.ibb.co/gMsLBjDv/terracota-plant-pot.webp"}
                 rating={product.rating_average}
                 ratingCount={product.rating_count}
               />
@@ -88,8 +85,6 @@ export default async function Page() {
 
 
       </main>
-    </SessionProvider>
-
   );
 }
 

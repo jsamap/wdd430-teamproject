@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import sql from "@/app/lib/db/postgres";
+import { auth } from "@/auth";
 
 type ProductBody = {
   name: string;
@@ -11,6 +12,8 @@ type ProductBody = {
   details?: string | null;
   rating_average?: number;
   rating_count?: number;
+  /** When logged in as admin, product is owned by this seller user id. */
+  sellerUserId?: string | null;
 };
 
 export async function GET() {
@@ -34,6 +37,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+    const role = (session?.user as { role?: string })?.role;
+    if (!session?.user?.id || (role !== "seller" && role !== "admin")) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = (await request.json()) as ProductBody;
 
     const {
@@ -46,6 +55,7 @@ export async function POST(request: Request) {
       details,
       rating_average,
       rating_count,
+      sellerUserId,
     } = body;
 
     if (
@@ -99,8 +109,37 @@ export async function POST(request: Request) {
       );
     }
 
+    let ownerUserId = session.user.id as string;
+
+    if (role === "admin") {
+      if (sellerUserId) {
+        const sellerRow = await sql`
+          SELECT id FROM users WHERE id = ${sellerUserId} AND role = 'seller' LIMIT 1
+        `;
+        if (sellerRow.length === 0) {
+          return NextResponse.json(
+            { message: "Invalid seller user id" },
+            { status: 400 },
+          );
+        }
+        ownerUserId = sellerRow[0].id as string;
+      } else {
+        const fallback = await sql`
+          SELECT id FROM users WHERE role = 'seller' ORDER BY name ASC LIMIT 1
+        `;
+        if (fallback.length === 0) {
+          return NextResponse.json(
+            { message: "No seller accounts exist. Create a seller user first." },
+            { status: 400 },
+          );
+        }
+        ownerUserId = fallback[0].id as string;
+      }
+    }
+
     const created = await sql`
       INSERT INTO products (
+        user_id,
         name,
         category,
         description,
@@ -112,6 +151,7 @@ export async function POST(request: Request) {
         rating_count
       )
       VALUES (
+        ${ownerUserId},
         ${name},
         ${category},
         ${description},

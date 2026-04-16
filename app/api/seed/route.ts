@@ -15,6 +15,9 @@ async function seedUsers(limit_users: number) {
   `;
 
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(50) DEFAULT 'buyer';`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS seller_tagline VARCHAR(255)`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS seller_bio TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS seller_story TEXT`;
 
   const insertedUsers = await Promise.all(
     dataUsers.slice(0, limit_users).map(async (user) => {
@@ -62,6 +65,12 @@ async function seedProducts(limit_products: number) {
       details TEXT NULL
     );
   `;
+
+  try {
+    await sql`ALTER TABLE products ALTER COLUMN image TYPE TEXT`;
+  } catch {
+    // Column may already be TEXT or table missing; safe to ignore for local dev
+  }
 
   const insertedProducts = await Promise.all(
     dataProducts.slice(0, limit_products).map(async (product) => {
@@ -129,6 +138,16 @@ async function seedReviews() {
   return insertedReviews;
 }
 
+async function seedWishlist() {
+  await sql`
+    CREATE TABLE IF NOT EXISTS wishlist (
+      id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE
+    );
+  `;
+}
+
 export async function POST(request: Request) {
   const body = await request.json();
   const {
@@ -146,6 +165,7 @@ export async function POST(request: Request) {
       await seedUsers(limit_users ?? dataUsers.length),
       await seedProducts(limit_products ?? dataProducts.length),
       await seedReviews(),
+      await seedWishlist(),
       // add here the other tables
     ]);
 
@@ -166,16 +186,18 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    // delete data from tables
+    // delete data from tables (products reference users)
+    await sql`DELETE FROM wishlist`;
     await sql`DELETE FROM reviews`;
-    await sql`DELETE FROM users`;
     await sql`DELETE FROM products`;
+    await sql`DELETE FROM users`;
     // add here the other tables
 
-    // delete tables to create new ones with the new schema
-      await sql`DROP TABLE IF EXISTS reviews CASCADE`;
-      await sql`DROP TABLE IF EXISTS users CASCADE`;
-      await sql`DROP TABLE IF EXISTS products CASCADE`;
+    // delete tables (respect foreign keys)
+    await sql`DROP TABLE IF EXISTS wishlist CASCADE`;
+    await sql`DROP TABLE IF EXISTS reviews CASCADE`;
+    await sql`DROP TABLE IF EXISTS products CASCADE`;
+    await sql`DROP TABLE IF EXISTS users CASCADE`;
     // add here the other tables
     return Response.json({ message: "Database cleared successfully" });
   } catch (error) {

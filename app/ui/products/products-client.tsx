@@ -21,22 +21,43 @@ const categories = [
   "Basketry",
 ];
 
-export default function ProductsClient({ products }: { products: any[] }) {
+const PLACEHOLDER_IMAGE =
+  "https://i.ibb.co/gMsLBjDv/terracota-plant-pot.webp";
+
+function categoryFromUrlParam(param?: string | null) {
+  if (!param) return "All";
+  const decoded = decodeURIComponent(param.trim());
+  const found = categories.find((c) => c.toLowerCase() === decoded.toLowerCase());
+  return found ?? "All";
+}
+
+export default function ProductsClient({
+  products,
+  initialCategory,
+}: {
+  products: any[];
+  initialCategory?: string | null;
+}) {
   const [darkMode, setDarkMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceFilter, setPriceFilter] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(() =>
+    categoryFromUrlParam(initialCategory),
+  );
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch =
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase());
+        (product.description &&
+          product.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.category &&
+          product.category.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesCategory =
         selectedCategory === "All" ||
-        (product.category && product.category.toLowerCase() === selectedCategory.toLowerCase());
+        (product.category &&
+          product.category.toLowerCase() === selectedCategory.toLowerCase());
 
       const matchesPrice =
         priceFilter === "all" ||
@@ -133,7 +154,7 @@ export default function ProductsClient({ products }: { products: any[] }) {
               }
             >
               <Image
-                src={product.image}
+                src={product.image || PLACEHOLDER_IMAGE}
                 alt={product.name}
                 width={180}
                 height={180}
