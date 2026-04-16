@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import ProductForm from "../../../ui/components/products/ProductForm";
-import { ProductFormData } from "@/lib/types";
+import { ProductFormData } from "@/app/lib/types";
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -22,20 +22,21 @@ export default function NewProductPage() {
           stock: Number(newProduct.stock),
           image: newProduct.image ?? null,
           details: newProduct.details ?? null,
-          rating_average: Number(newProduct.rating_average),
-          rating_count: Number(newProduct.rating_count),
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to create product");
+        console.error("Create product API error:", data);
+        throw new Error(data.message || "Failed to create product");
       }
 
       router.push("/admin/products");
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create failed:", error);
-      alert("Failed to create product");
+      alert(error.message || "Failed to create product");
     }
   }
 

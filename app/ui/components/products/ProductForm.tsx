@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProductFormData } from "@/lib/types";
-
+import { ProductFormData } from "@/app/lib/types";
 type ProductFormProps = {
   initialData?: ProductFormData | null;
   onSave: (product: ProductFormData) => void | Promise<void>;
