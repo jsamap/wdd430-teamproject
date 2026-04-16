@@ -4,14 +4,20 @@ import { useState, useRef } from "react";
 import Link from "next/link";
 import HhLogo from "@/app/ui/hh-logo";
 import { usePathname } from "next/navigation";
-import { UserIcon, ShoppingCartIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-
+import {
+    UserIcon,
+    ShoppingCartIcon,
+    Bars3Icon,
+    XMarkIcon,
+    ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
+import { signOut, useSession } from "next-auth/react";
 
 export default function Navbar() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const cartIconRef = useRef<HTMLAnchorElement>(null);
-
+    const { data: session } = useSession();
 
     const navItems = [
         { href: "/", label: "Home" },
@@ -27,12 +33,12 @@ export default function Navbar() {
     return (
         <nav className="bg-black p-4">
             <div className="flex items-center justify-between">
-                {/* Logo on the left */}
+                {/* Logo */}
                 <Link href="/">
                     <HhLogo />
                 </Link>
 
-                {/* Hamburger toggle (mobile only) */}
+                {/* Hamburger toggle */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="text-white md:hidden"
@@ -44,8 +50,7 @@ export default function Navbar() {
                     )}
                 </button>
 
-
-                {/* Desktop nav on the right */}
+                {/* Desktop nav */}
                 <div className="hidden md:flex items-center space-x-8">
                     <ul className="flex space-x-6 text-white font-medium">
                         {navItems.map((item) => (
@@ -82,17 +87,27 @@ export default function Navbar() {
                                     </li>
                                 );
                             })}
-                        </ul>
 
+                            {/* Logout button only if authenticated */}
+                            {session && (
+                                <li>
+                                    <button
+                                        onClick={() => signOut()}
+                                        className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
+                                        aria-label="Logout"
+                                    >
+                                        <ArrowRightOnRectangleIcon className="h-6 w-6" />
+                                    </button>
+                                </li>
+                            )}
+                        </ul>
                     </div>
                 </div>
             </div>
 
-
             {/* Mobile nav dropdown */}
             {isOpen && (
                 <div className="md:hidden mt-4">
-                    {/* Tabs in mobile menu */}
                     <ul className="flex flex-col space-y-2 text-white font-medium">
                         {navItems.map((item) => (
                             <li key={item.href}>
@@ -111,12 +126,12 @@ export default function Navbar() {
                         ))}
                     </ul>
 
-                    {/* Icons in mobile menu */}
+                    {/* Mobile icons */}
                     <div className="flex space-x-2 mt-4 justify-end">
                         <ul className="flex space-x-2 justify-end text-white font-medium">
                             {navIcons.map((item) => {
                                 const Icon = item.icon;
-                                const isCart = item.href === "/carts";  
+                                const isCart = item.href === "/carts";
                                 return (
                                     <li key={item.href}>
                                         <Link
@@ -129,6 +144,22 @@ export default function Navbar() {
                                     </li>
                                 );
                             })}
+
+                            {/* Logout button only if authenticated */}
+                            {session && (
+                                <li>
+                                    <button
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            signOut();
+                                        }}
+                                        className="bg-hhorange-300 text-black rounded hover:bg-hhorange-500 flex items-center justify-center h-10 w-10"
+                                        aria-label="Logout"
+                                    >
+                                        <ArrowRightOnRectangleIcon className="h-6 w-6" />
+                                    </button>
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </div>
