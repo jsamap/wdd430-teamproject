@@ -1,12 +1,16 @@
 import Link from "next/link";
+import AddToCartButton from "../AddToCartButton";
+import Image from "next/image";
+import ReviewsSection from "../reviews/ReviewsSection";
+import ReviewRating from "../reviews/ReviewRating";
 
 export default async function ProductDetail({
-    product,
+  product,
 }: {
-    product: any;
+  product: any;
 }) {
-    return (
-        <main className="min-h-screen bg-[#F7F7F7] px-8 py-8 text-black">
+  return (
+    <main className="min-h-screen bg-[#F7F7F7] px-8 py-8 text-black">
       <div className="mx-auto max-w-5xl">
         <Link
           href="/products"
@@ -17,10 +21,13 @@ export default async function ProductDetail({
 
         <section className="flex flex-col items-center gap-6 md:flex-row md:items-start">
           <div className="w-full md:w-1/2">
-            <img
+            <Image
               src={product.image}
               alt={product.name}
-              className="w-full rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.1)]"
+              width={500}
+              height={500}
+              unoptimized
+              className="h-auto w-full rounded-lg object-cover"
             />
           </div>
 
@@ -28,26 +35,23 @@ export default async function ProductDetail({
             <h1 className="font-serif text-4xl font-bold">{product.name}</h1>
 
             <div className="font-bold text-[#FCB33D]">
-              ★★★★★ <span className="ml-1 font-normal text-black">{product.rating_average}/5 ({product.rating_count} reviews)</span>
+              <ReviewRating rating={product.rating_average} count={product.rating_count} />
             </div>
 
             <p className="text-xl font-bold text-[#FCB33D]">
-              ${product.price.toFixed(2)}
+              ${Number(product.price).toFixed(2)}
             </p>
 
             <p>{product.description}</p>
             <p>{product.details}</p>
 
-            <button
-              type="button"
-              className="mt-2 w-fit rounded-md bg-[#FCB33D] px-5 py-3 font-bold text-black transition hover:-translate-y-0.5"
-            >
-              Add to Cart
-            </button>
+            <AddToCartButton product={product} />
           </div>
         </section>
+
+        <ReviewsSection productId={product.id} />
       </div>
     </main>
-    );
+  );
 
 }

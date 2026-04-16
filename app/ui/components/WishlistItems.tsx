@@ -8,6 +8,7 @@ import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { use, useEffect, useState } from "react";
 import { addToCartLocal } from "@/app/lib/actions/local.actions";
 import { flyToCart } from "@/app/ui/animation/animation";
+import ReviewRating from "../reviews/ReviewRating";
 
 export default function WishlistItems({ initialItems }: { initialItems: any[] }) {
   const [items, setItems] = useState(initialItems);
@@ -48,13 +49,9 @@ export default function WishlistItems({ initialItems }: { initialItems: any[] })
               <h2 className="mb-1 text-2xl font-bold">{item.name}</h2>
               <p className="mb-1 text-sm italic">{item.category}</p>
               <div className="mb-1 flex items-center">
-                {[...Array(5)].map((_, i) =>
-                  i < Math.round(item.rating_average) ? (
-                    <StarIcon key={i} className="h-5 w-5 text-[#FCB33D]" />
-                  ) : (
-                    <StarOutline key={i} className="h-5 w-5 text-gray-300" />
-                  )
-                )}
+                <div className="font-bold text-[#FCB33D]">
+                  <ReviewRating rating={item.rating_average} count={item.rating_count}/>
+                </div>
               </div>
               <p className="my-2 text-xl">${item.price.toFixed(2)}</p>
               <div className="mt-3 flex flex-wrap gap-3">

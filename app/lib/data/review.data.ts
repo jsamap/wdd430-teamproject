@@ -7,5 +7,30 @@ export async function getLatestReviews() {
     } catch (error) {
         console.error('Failed to fetch latest reviews:', error);
         throw new Error('Failed to fetch latest reviews.');
+
+    }
+}
+
+export async function getReviewsByProductId(productId: string) {
+    try {
+        const reviews = await sql`
+            SELECT 
+                r.id, 
+                r.product_id, 
+                r.user_id, 
+                r.rating, 
+                r.review, 
+                r.created_at, 
+                r.updated_at,
+                u.name as user_name
+            FROM reviews r
+            LEFT JOIN users u ON r.user_id = u.id
+            WHERE r.product_id = ${productId}
+            ORDER BY r.created_at DESC
+        `;
+        return reviews;
+    } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+        throw new Error('Failed to fetch reviews.');
     }
 }
