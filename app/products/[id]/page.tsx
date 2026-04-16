@@ -2,74 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { use } from "react";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
+import { addToCartLocal } from "@/app/lib/actions/local.actions";
+import { flyToCart } from "@/app/ui/animation/animation";
 
-const products = [
-  {
-    id: "1",
-    name: "Wooden Bowl",
-    category: "Kitchen",
-    description: "A handcrafted wooden bowl perfect for home décor or serving.",
-    price: 25,
-    rating: 4.8,
-    image: "/product1.jpg",
-  },
-  {
-    id: "2",
-    name: "Ceramic Mug",
-    category: "Pottery",
-    description: "A beautifully made ceramic mug for your favorite hot drink.",
-    price: 18,
-    rating: 4.7,
-    image: "/product2.jpg",
-  },
-  {
-    id: "3",
-    name: "Handwoven Basket",
-    category: "Home Decor",
-    description: "A natural woven basket great for storage and decoration.",
-    price: 30,
-    rating: 4.9,
-    image: "/product3.jpg",
-  },
-  {
-    id: "4",
-    name: "Handmade Necklace",
-    category: "Jewelry",
-    description: "A unique handmade necklace crafted to add charm to any outfit.",
-    price: 35,
-    rating: 4.6,
-    image: "/product4.jpg",
-  },
-  {
-    id: "5",
-    name: "Canvas Wall Art",
-    category: "Art",
-    description: "A handcrafted art piece designed to brighten your living space.",
-    price: 40,
-    rating: 4.9,
-    image: "/product5.jpg",
-  },
-  {
-    id: "6",
-    name: "Woodworking Project",
-    category: "Woodworking",
-    description: "Custom handcrafted woodwork pieces made with precision.",
-    price: 60,
-    rating: 4.9,
-    image: "/product6.jpg",
-  },
-  {
-    id: "7",
-    name: "Pottery Vase",
-    category: "Pottery",
-    description: "Hand-thrown pottery with beautiful natural finishes.",
-    price: 45,
-    rating: 4.8,
-    image: "/product7.jpg",
-  },
-];
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  rating: number;
+  image: string;
+  description: string;
+};
 
 export default function ProductDetail({
   params,
@@ -78,19 +23,32 @@ export default function ProductDetail({
 }) {
   const { id } = use(params);
   const [darkMode, setDarkMode] = useState(false);
+  const [product, setProduct] = useState<Product | null>(null);
 
-  const product = products.find((p) => p.id === id);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch(`/api/products/${id}`);
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch product");
+        }
+
+        const data = await res.json();
+        setProduct(data);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        setProduct(null);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
 
   if (!product) {
     return (
-      <main
-        className={
-          darkMode
-            ? "min-h-screen bg-black p-6 text-white"
-            : "min-h-screen bg-[#F7F7F7] p-6 text-black"
-        }
-      >
-        <p className="text-xl">Product not found</p>
+      <main className="min-h-screen bg-black p-6 text-white">
+        <p className="text-xl">Loading or Product not found...</p>
       </main>
     );
   }
@@ -111,10 +69,11 @@ export default function ProductDetail({
         }
       >
         <Image
-          src="/hh-logo.png"
+          src="/images/hh-logo.png"
           alt="Handcrafted Haven Logo"
           width={180}
           height={50}
+          style={{ width: "180px", height: "auto" }}
         />
 
         <div className="flex items-center gap-4">
@@ -135,6 +94,7 @@ export default function ProductDetail({
       <section className="flex flex-col gap-8 px-8 py-8 md:flex-row">
         <div className="w-full md:w-1/2">
           <Image
+            id={`product-image-${product.id}`}
             src={product.image}
             alt={product.name}
             width={500}
@@ -145,7 +105,6 @@ export default function ProductDetail({
 
         <div className="w-full md:w-1/2">
           <h1 className="mb-2 text-4xl font-bold">{product.name}</h1>
-
           <p className="mb-2 text-lg italic">{product.category}</p>
 
           <div className="mb-4 font-bold text-[#FCB33D]">
@@ -161,24 +120,35 @@ export default function ProductDetail({
             ${product.price.toFixed(2)}
           </p>
 
-          <button
-            type="button"
-            className="rounded-md bg-[#FCB33D] px-6 py-3 font-bold text-black"
-          >
-            Add to Cart
-          </button>
+          <div className="flex gap-4">
+            <Link
+              href="/products"
+              className="inline-block rounded-md bg-[#FCB33D] px-6 py-3 font-bold text-black"
+            >
+              Back to Products
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => {
+                const imageEl = document.getElementById(
+                  `product-image-${product.id}`,
+                ) as HTMLImageElement;
+                const cartIconEl = document.getElementById("cart-icon");
+
+                if (imageEl && cartIconEl) {
+                  flyToCart(imageEl, cartIconEl);
+                }
+
+                addToCartLocal(product, 1);
+              }}
+              className="rounded-md bg-[#FCB33D] px-6 py-3 font-bold text-black"
+            >
+              Add to Cart
+            </button>
+          </div>
         </div>
       </section>
-
-      <footer
-        className={
-          darkMode
-            ? "mt-8 bg-black px-4 py-4 text-center text-white"
-            : "mt-8 bg-[#6496FA] px-4 py-4 text-center text-white"
-        }
-      >
-        <p>&copy; 2026 Handcrafted Haven | All Rights Reserved</p>
-      </footer>
     </main>
   );
 }

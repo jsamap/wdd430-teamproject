@@ -1,64 +1,67 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { addToCartLocal } from "@/app/lib/actions/local.actions";
+import { useTransition } from "react";
+import { flyToCart } from "../ui/animation/animation";
 
-const products = [
-  {
-    id: "1",
-    name: "Wooden Bowl",
-    category: "Kitchen",
-    description: "A handcrafted wooden bowl perfect for home décor or serving.",
-    price: 25,
-    rating: 4.8,
-    image: "/product1.jpg",
-  },
-  {
-    id: "2",
-    name: "Ceramic Mug",
-    category: "Kitchen",
-    description: "A beautifully made ceramic mug for your favorite hot drink.",
-    price: 18,
-    rating: 4.7,
-    image: "/product2.jpg",
-  },
-  {
-    id: "3",
-    name: "Handwoven Basket",
-    category: "Home Decor",
-    description: "A natural woven basket great for storage and decoration.",
-    price: 30,
-    rating: 4.9,
-    image: "/product3.jpg",
-  },
-  {
-    id: "4",
-    name: "Handmade Necklace",
-    category: "Jewelry",
-    description: "A unique handmade necklace crafted to add charm to any outfit.",
-    price: 35,
-    rating: 4.6,
-    image: "/product4.jpg",
-  },
-  {
-    id: "5",
-    name: "Canvas Wall Art",
-    category: "Art",
-    description: "A handcrafted art piece designed to brighten your living space.",
-    price: 40,
-    rating: 4.9,
-    image: "/product5.jpg",
-  },
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  image: string;
+  description: string;
+  rating: number;
+};
+
+const categories = [
+  "All",
+  "Home Decor",
+  "Kitchen",
+  "Jewelry",
+  "Art",
+  "Furniture",
+  "Gifts",
+  "Woodworking",
+  "Paints",
+  "Tools",
+  "Pottery",
+  "Basketry",
 ];
 
-const categories = ["All", "Kitchen", "Home Decor", "Jewelry", "Art"];
-
 export default function ProductsPage() {
+  const [products, setProducts] = useState<Product[]>([]);
   const [darkMode, setDarkMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [priceFilter, setPriceFilter] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [isPending] = useTransition();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("/api/products");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch products");
+        }
+
+        const data = await res.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -68,7 +71,8 @@ export default function ProductsPage() {
         product.category.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
-        selectedCategory === "All" || product.category === selectedCategory;
+        selectedCategory === "All" ||
+        product.category.toLowerCase() === selectedCategory.toLowerCase();
 
       const matchesPrice =
         priceFilter === "all" ||
@@ -78,7 +82,7 @@ export default function ProductsPage() {
 
       return matchesSearch && matchesCategory && matchesPrice;
     });
-  }, [searchTerm, priceFilter, selectedCategory]);
+  }, [products, searchTerm, priceFilter, selectedCategory]);
 
   return (
     <main
@@ -88,44 +92,6 @@ export default function ProductsPage() {
           : "min-h-screen bg-[#F7F7F7] text-black"
       }
     >
-      <header
-        className={
-          darkMode
-            ? "sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 bg-black px-8 py-4 text-white shadow-md"
-            : "sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 bg-[#6496FA] px-8 py-4 text-white shadow-md"
-        }
-      >
-        <Image
-          src="/hh-logo.png"
-          alt="Handcrafted Haven Logo"
-          width={180}
-          height={50}
-        />
-
-        <nav className="flex flex-wrap gap-4 font-bold">
-          <Link href="/" className="hover:text-[#FCB33D] hover:underline">
-            Home
-          </Link>
-          <Link href="/products" className="hover:text-[#FCB33D] hover:underline">
-            Products
-          </Link>
-          <Link href="/cart" className="hover:text-[#FCB33D] hover:underline">
-            Cart
-          </Link>
-          <Link href="/contact" className="hover:text-[#FCB33D] hover:underline">
-            Contact
-          </Link>
-        </nav>
-
-        <button
-          type="button"
-          onClick={() => setDarkMode((prev) => !prev)}
-          className="rounded-md bg-[#FCB33D] px-4 py-2 font-bold text-black"
-        >
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
-      </header>
-
       <section className="px-8 py-6 text-center">
         <input
           type="text"
@@ -162,20 +128,23 @@ export default function ProductsPage() {
         </select>
       </section>
 
-      <section className="px-8 pb-4">
-        <h2 className="mb-2 font-medium">Filter by category:</h2>
-        <div className="flex flex-wrap gap-2">
+      <section className="px-8 pb-6">
+        <h2 className="mb-4 text-center text-2xl font-medium">
+          Shop by Category
+        </h2>
+
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           {categories.map((category) => (
             <button
               key={category}
               type="button"
               onClick={() => setSelectedCategory(category)}
-              className={`rounded-md px-4 py-2 font-bold ${
+              className={`rounded-2xl border-2 px-8 py-6 text-lg font-bold transition ${
                 selectedCategory === category
-                  ? "bg-[#FCB33D] text-black"
+                  ? "border-[#6496FA] bg-[#FCB33D] text-black"
                   : darkMode
-                  ? "bg-gray-700 text-white"
-                  : "bg-gray-200 text-black"
+                    ? "border-[#6496FA] bg-gray-800 text-white"
+                    : "border-[#6496FA] bg-white text-black"
               }`}
             >
               {category}
@@ -189,7 +158,9 @@ export default function ProductsPage() {
       </section>
 
       <section className="flex flex-col gap-6 px-8 pb-8">
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <p className="px-2 text-lg">Loading products...</p>
+        ) : filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <article
               key={product.id}
@@ -200,11 +171,13 @@ export default function ProductsPage() {
               }
             >
               <Image
+                id={`product-image-${product.id}`}
                 src={product.image}
                 alt={product.name}
-                width={300}
+                width={180}
                 height={180}
-                className="h-auto w-full max-w-[300px] rounded-lg object-cover md:h-[180px] md:w-[180px]"
+                style={{ width: "180px", height: "auto" }}
+                className="rounded-lg object-cover"
               />
 
               <div className="w-full">
@@ -233,9 +206,22 @@ export default function ProductsPage() {
 
                   <button
                     type="button"
+                    onClick={() => {
+                      const imageEl = document.getElementById(
+                        `product-image-${product.id}`
+                      ) as HTMLImageElement;
+                      const cartIconEl = document.getElementById("cart-icon");
+
+                      if (imageEl && cartIconEl) {
+                        flyToCart(imageEl, cartIconEl);
+                      }
+
+                      addToCartLocal(product, 1);
+                    }}
+                    disabled={isPending}
                     className="rounded-md bg-[#FCB33D] px-5 py-3 font-bold text-black"
                   >
-                    Add to Cart
+                    {isPending ? "Adding..." : "Add to Cart"}
                   </button>
                 </div>
               </div>
@@ -245,16 +231,6 @@ export default function ProductsPage() {
           <p className="px-2 text-lg">No products match your filters.</p>
         )}
       </section>
-
-      <footer
-        className={
-          darkMode
-            ? "mt-8 bg-black px-4 py-4 text-center text-white"
-            : "mt-8 bg-[#6496FA] px-4 py-4 text-center text-white"
-        }
-      >
-        <p>&copy; 2026 Handcrafted Haven | All Rights Reserved</p>
-      </footer>
     </main>
   );
 }
