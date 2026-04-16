@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutline } from "@heroicons/react/24/outline";
 import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { use, useEffect, useState } from "react";
+import { addToCartLocal } from "@/app/lib/actions/local.actions";
+import { flyToCart } from "@/app/ui/animation/animation";
 
 export default function WishlistItems({ initialItems }: { initialItems: any[] }) {
   const [items, setItems] = useState(initialItems);
@@ -35,6 +37,7 @@ export default function WishlistItems({ initialItems }: { initialItems: any[] })
             }`}
           >
             <Image
+              id={`product-image-${item.id}`}
               src={item.image}
               alt={item.name}
               width={180}
@@ -62,6 +65,19 @@ export default function WishlistItems({ initialItems }: { initialItems: any[] })
                   View Details
                 </Link>
                 <button
+                    onClick={() => {
+                    const imageEl = document.getElementById(
+                      `product-image-${item.id}`,
+                    ) as HTMLImageElement;
+                    const cartIconEl = document.getElementById("cart-icon");
+                    console.log(imageEl);
+                    console.log(cartIconEl);
+                    if (imageEl && cartIconEl) {
+                      flyToCart(imageEl, cartIconEl);
+                    }
+
+                    addToCartLocal(item, 1);
+                  }}
                   type="button"
                   className="rounded-md text-white bg-gray-400 px-3 py-3 hover:bg-hhblue-500 flex items-center justify-center"
                 >
