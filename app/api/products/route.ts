@@ -125,6 +125,7 @@ export async function POST(request: Request) {
       RETURNING *;
     `;
 
+    
     return NextResponse.json(created[0], { status: 201 });
   } catch (error) {
     console.error("POST /api/products error:", error);
