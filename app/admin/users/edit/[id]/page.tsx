@@ -1,30 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-type ProfileFormData = {
+type UserFormData = {
   name: string;
   email: string;
+  role: string;
 };
 
-export default function EditProfilePage() {
-  const [formData, setFormData] = useState<ProfileFormData>({
-    name: "",
-    email: "",
-  });
-  const [loading, setLoading] = useState(true);
+export default function EditUserPage() {
+  const params = useParams();
   const router = useRouter();
 
+  const [formData, setFormData] = useState<UserFormData>({
+    name: "",
+    email: "",
+    role: "",
+  });
+
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    async function loadProfile() {
+    async function loadUser() {
       try {
-        const res = await fetch("/api/users/me", {
+        const res = await fetch(`/api/users/${params.id}`, {
           cache: "no-store",
         });
 
         if (!res.ok) {
-          throw new Error("Failed to fetch profile");
+          throw new Error("Failed to fetch user");
         }
 
         const user = await res.json();
@@ -32,18 +37,23 @@ export default function EditProfilePage() {
         setFormData({
           name: user.name ?? "",
           email: user.email ?? "",
+          role: user.role ?? "",
         });
       } catch (error) {
-        console.error("Failed to load profile:", error);
+        console.error("Failed to load user:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    loadProfile();
-  }, []);
+    if (params.id) {
+      loadUser();
+    }
+  }, [params.id]);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -56,7 +66,7 @@ export default function EditProfilePage() {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/users/me", {
+      const res = await fetch(`/api/users/${params.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -65,24 +75,24 @@ export default function EditProfilePage() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to update profile");
+        throw new Error("Failed to update user");
       }
 
-      router.push("/admin/profile");
+      router.push("/admin/users");
       router.refresh();
     } catch (error) {
-      console.error("Failed to save profile:", error);
-      alert("Failed to update profile");
+      console.error("Update failed:", error);
+      alert("Failed to update user");
     }
   }
 
   if (loading) {
-    return <div className="p-6">Loading form...</div>;
+    return <div className="p-6">Loading user...</div>;
   }
 
   return (
     <section className="space-y-6 p-6">
-      <h2 className="text-2xl font-semibold">Edit Profile</h2>
+      <h2 className="text-2xl font-semibold">Edit User</h2>
 
       <form
         onSubmit={handleSubmit}
@@ -109,6 +119,22 @@ export default function EditProfilePage() {
             className="w-full rounded-lg border p-3"
             required
           />
+        </div>
+
+        <div>
+          <label className="mb-1 block font-medium">Role</label>
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            className="w-full rounded-lg border p-3"
+            required
+          >
+            <option value="">Select role</option>
+            <option value="admin">Admin</option>
+            <option value="seller">Seller</option>
+            <option value="buyer">Buyer</option>
+          </select>
         </div>
 
         <button

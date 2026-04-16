@@ -1,18 +1,76 @@
-"use client";
+import { Product, ProductFormData } from "@/app/lib/types";
 
-export const getProducts = () => {
-  if (typeof window === "undefined") return [];
+export const getProducts = async (): Promise<Product[]> => {
+  const res = await fetch("/api/products", {
+    cache: "no-store",
+  });
 
-  const savedProducts = localStorage.getItem("products");
-  return savedProducts ? JSON.parse(savedProducts) : [];
+  if (!res.ok) {
+    throw new Error("Failed to fetch products");
+  }
+
+  return res.json();
 };
 
-export const saveProducts = (products: any[]) => {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("products", JSON.stringify(products));
+export const getProductById = async (id: string): Promise<Product> => {
+  const res = await fetch(`/api/products/${id}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch product");
+  }
+
+  return res.json();
 };
 
-export const getProductById = (id: string) => {
-  const products = getProducts();
-  return products.find((product: any) => product.id === id);
+export const createProduct = async (
+  product: ProductFormData
+): Promise<Product> => {
+  const res = await fetch("/api/products", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(product),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to create product");
+  }
+
+  return res.json();
+};
+
+export const updateProduct = async (
+  id: string,
+  product: ProductFormData
+): Promise<Product> => {
+  const res = await fetch(`/api/products/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(product),
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to update product");
+  }
+
+  return res.json();
+};
+
+export const deleteProduct = async (
+  id: string
+): Promise<{ message: string }> => {
+  const res = await fetch(`/api/products/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to delete product");
+  }
+
+  return res.json();
 };

@@ -2,24 +2,51 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import ProfileCard from "@/app/ui/components/profile/ProfileCard";
-import { getProfile } from "../../../lib/profile-storage";
-import type { Profile } from "@/lib/types";
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+};
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const profileData = getProfile();
-    setProfile(profileData);
+    async function loadProfile() {
+      try {
+        const res = await fetch("/api/users/me", {
+          cache: "no-store",
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch profile");
+        }
+
+        const data = await res.json();
+        setProfile(data);
+      } catch (error) {
+        console.error("Profile load error:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfile();
   }, []);
 
+  if (loading) {
+    return <div className="p-6">Loading profile...</div>;
+  }
+
   if (!profile) {
-    return <div>Loading profile...</div>;
+    return <div className="p-6">Profile not found</div>;
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-6 p-6">
       <div className="flex justify-end">
         <Link
           href="/admin/profile/edit"
@@ -29,7 +56,16 @@ export default function ProfilePage() {
         </Link>
       </div>
 
-      <ProfileCard profile={profile} />
+      <div className="max-w-xl rounded-2xl border bg-white p-6 shadow-sm">
+        <h2 className="text-2xl font-semibold">{profile.name}</h2>
+        <p className="mt-2 text-gray-600">{profile.email}</p>
+
+        <div className="mt-4">
+          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm">
+            {profile.role}
+          </span>
+        </div>
+      </div>
     </section>
   );
 }
