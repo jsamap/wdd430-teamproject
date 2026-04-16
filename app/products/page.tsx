@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import { addToCartLocal } from "@/app/lib/actions/local.actions";
 import { useTransition } from "react";
 import { flyToCart } from "../ui/animation/animation";
+import { toggleWishlist, isInWishlist } from "@/app/lib/wishlist";
 
 const products = [
   {
@@ -455,6 +456,23 @@ export default function ProductsPage() {
   const [priceFilter, setPriceFilter] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isPending, startTransition] = useTransition();
+  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("wishlist");
+    const parsed = stored ? JSON.parse(stored) : [];
+    setWishlistIds(parsed.map((item: { id: string }) => item.id));
+  }, []);
+
+  const handleWishlistToggle = (product: {
+    id: string;
+    name: string;
+    price: number;
+    image?: string;
+  }) => {
+    const updated = toggleWishlist(product);
+    setWishlistIds(updated.map((item) => item.id));
+  };
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -548,6 +566,16 @@ export default function ProductsPage() {
 
       <section className="px-8 pb-4">
         <h1 className="text-4xl font-bold">Our Products</h1>
+
+        
+        <div className="mt-4">
+          <Link
+            href="/wishlist"
+            className="rounded-md bg-pink-600 px-5 py-3 font-bold text-white"
+          >
+            ♥ View Wishlist
+          </Link>
+        </div>
       </section>
 
       <section className="flex flex-col gap-6 px-8 pb-8">
@@ -612,6 +640,28 @@ export default function ProductsPage() {
                     className="rounded-md bg-[#FCB33D] px-5 py-3 font-bold text-black"
                   >
                     {isPending ? "Adding..." : "Add to Cart"}
+                  </button>
+
+                  {/* 🔥 ADD THIS BUTTON RIGHT HERE */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleWishlistToggle({
+                        id: product.id,
+                        name: product.name,
+                        price: product.price,
+                        image: product.image,
+                      })
+                    }
+                    className={
+                      wishlistIds.includes(product.id)
+                        ? "rounded-md bg-pink-600 px-5 py-3 font-bold text-white"
+                        : darkMode
+                          ? "rounded-md bg-gray-700 px-5 py-3 font-bold text-white"
+                          : "rounded-md bg-gray-200 px-5 py-3 font-bold text-black"
+                    }
+                  >
+                    {wishlistIds.includes(product.id) ? "♥ Saved" : "♡ Wishlist"}
                   </button>
                 </div>
               </div>
