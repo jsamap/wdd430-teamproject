@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { addToCartLocal } from "@/app/lib/actions/local.actions";
+import { useTransition } from "react";
+import { flyToCart } from "../ui/animation/animation";
 
 type Product = {
   id: string;
@@ -11,7 +14,7 @@ type Product = {
   price: number;
   image: string;
   description: string;
-  rating?: number;
+  rating: number;
 };
 
 const categories = [
@@ -36,6 +39,7 @@ export default function ProductsPage() {
   const [priceFilter, setPriceFilter] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [isPending] = useTransition();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -88,46 +92,6 @@ export default function ProductsPage() {
           : "min-h-screen bg-[#F7F7F7] text-black"
       }
     >
-      <header
-        className={
-          darkMode
-            ? "sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 bg-black px-8 py-4 text-white shadow-md"
-            : "sticky top-0 z-50 flex flex-wrap items-center justify-between gap-4 bg-[#6496FA] px-8 py-4 text-white shadow-md"
-        }
-      >
-        <Image
-          src="/images/hh-logo.png"
-          alt="Handcrafted Haven Logo"
-          width={180}
-          height={50}
-          priority
-          style={{ width: "180px", height: "auto" }}
-        />
-
-        <nav className="flex flex-wrap gap-4 font-bold">
-          <Link href="/" className="hover:text-[#FCB33D] hover:underline">
-            Home
-          </Link>
-          <Link href="/products" className="hover:text-[#FCB33D] hover:underline">
-            Products
-          </Link>
-          <Link href="/cart" className="hover:text-[#FCB33D] hover:underline">
-            Cart
-          </Link>
-          <Link href="/contact" className="hover:text-[#FCB33D] hover:underline">
-            Contact
-          </Link>
-        </nav>
-
-        <button
-          type="button"
-          onClick={() => setDarkMode((prev) => !prev)}
-          className="rounded-md bg-[#FCB33D] px-4 py-2 font-bold text-black"
-        >
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
-      </header>
-
       <section className="px-8 py-6 text-center">
         <input
           type="text"
@@ -165,7 +129,9 @@ export default function ProductsPage() {
       </section>
 
       <section className="px-8 pb-6">
-        <h2 className="mb-4 text-center text-2xl font-medium">Shop by Category</h2>
+        <h2 className="mb-4 text-center text-2xl font-medium">
+          Shop by Category
+        </h2>
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           {categories.map((category) => (
@@ -205,6 +171,7 @@ export default function ProductsPage() {
               }
             >
               <Image
+                id={`product-image-${product.id}`}
                 src={product.image}
                 alt={product.name}
                 width={180}
@@ -239,9 +206,22 @@ export default function ProductsPage() {
 
                   <button
                     type="button"
+                    onClick={() => {
+                      const imageEl = document.getElementById(
+                        `product-image-${product.id}`
+                      ) as HTMLImageElement;
+                      const cartIconEl = document.getElementById("cart-icon");
+
+                      if (imageEl && cartIconEl) {
+                        flyToCart(imageEl, cartIconEl);
+                      }
+
+                      addToCartLocal(product, 1);
+                    }}
+                    disabled={isPending}
                     className="rounded-md bg-[#FCB33D] px-5 py-3 font-bold text-black"
                   >
-                    Add to Cart
+                    {isPending ? "Adding..." : "Add to Cart"}
                   </button>
                 </div>
               </div>
@@ -251,16 +231,6 @@ export default function ProductsPage() {
           <p className="px-2 text-lg">No products match your filters.</p>
         )}
       </section>
-
-      <footer
-        className={
-          darkMode
-            ? "mt-8 bg-black px-4 py-4 text-center text-white"
-            : "mt-8 bg-[#6496FA] px-4 py-4 text-center text-white"
-        }
-      >
-        <p>&copy; 2026 Handcrafted Haven | All Rights Reserved</p>
-      </footer>
     </main>
   );
 }

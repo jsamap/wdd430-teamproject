@@ -4,6 +4,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  CartData,
+  placeOrderAndSaveDeliverable,
+  getCartTotalLocal,
+} from "../../lib/actions/local.actions";
 
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -32,8 +38,27 @@ export default function CheckoutPage() {
 
   const onSubmit = (data: FormData) => {
     console.log("Order placed:", data);
+    const deliverable = placeOrderAndSaveDeliverable();
+    console.log("Deliverable created:", deliverable);
     router.push("/carts/success");
   };
+
+  const [cartData, setCartData] = useState<CartData>({
+    cart: [],
+    subtotal: 0,
+    tax: 0,
+    total: 0,
+    totalItems: 0,
+    shipping: 0,
+  });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const data = getCartTotalLocal();
+      console.log("Loaded cart:", data); // 🔍 Debugging
+      setCartData(data);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center py-10">
@@ -102,7 +127,7 @@ export default function CheckoutPage() {
           </h3>
           <input
             {...register("cardNumber")}
-            placeholder="Card Number"
+            placeholder="Card Number(must be atleast 16 digits) "
             className="w-full border p-2 rounded-md"
           />
           {errors.cardNumber && (
@@ -139,18 +164,28 @@ export default function CheckoutPage() {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-gray-800">
             Order Summary
+            <div className="space-y-2 text-gray-700">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span>${cartData.subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span className="text-green-600">
+                  ${cartData.shipping.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Tax</span>
+                <span>${cartData.tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg border-t pt-2">
+                <span>Total</span>
+                <span>${cartData.total.toFixed(2)}</span>
+              </div>
+            </div>
           </h2>
-          <div className="border-t border-gray-200 pt-4 space-y-2">
-            <div className="flex justify-between text-gray-700">
-              <span>Example Item x 1</span>
-            </div>
-            <div className="flex justify-between text-gray-700">
-              <span>Another Item x 2</span>
-            </div>
-            <div className="border-t border-gray-200 pt-2 flex justify-between font-medium">
-              <span>Total</span>
-            </div>
-          </div>
+
           <div className="flex items-center gap-2 text-sm text-gray-500 mt-4">
             <span>🔒 Secure Checkout</span>
             <span>VISA • Mastercard • PayPal</span>

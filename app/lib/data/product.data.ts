@@ -2,7 +2,7 @@ import sql from "@/app/lib/db/postgres";
 
 export async function getProducts() {
     try {
-        const products = await sql`SELECT * FROM products`;
+        const products = await sql`SELECT id, name, description, price, image, rating_average, rating_count, details FROM products`;
         return products;
     } catch (error) {
         console.error('Failed to fetch products:', error);
@@ -12,7 +12,7 @@ export async function getProducts() {
 
 export async function getFeaturedProducts() {
     try {
-        const products = await sql`SELECT * FROM products ORDER BY RANDOM() ASC LIMIT 4`;
+        const products = await sql`SELECT id, name, description, price, image, rating_average, rating_count, details FROM products ORDER BY RANDOM() ASC LIMIT 4`;
         return products;
     } catch (error) {
         console.error('Failed to fetch products:', error);

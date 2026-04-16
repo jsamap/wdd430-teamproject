@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import ProfileForm from "../../../../components/profile/ProfileForm";
+import ProfileForm from "../../../ui/components/profile/ProfileForm";
 import { getProfile, saveProfile } from "../../../../lib/profile-storage";
 
 export default function EditProfilePage() {

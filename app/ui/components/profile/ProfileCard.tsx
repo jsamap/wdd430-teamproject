@@ -1,4 +1,4 @@
-import type { Profile } from "../../lib/types";
+import type { Profile } from "../../../../lib/types";
 
 type ProfileCardProps = {
   profile: Profile;

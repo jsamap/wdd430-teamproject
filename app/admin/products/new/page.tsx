@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import ProductForm from "../../../../components/products/ProductForm";
+import ProductForm from "../../../ui/components/products/ProductForm";
 import { getProducts, saveProducts } from "../../../../lib/product-storage";
 
 export default function NewProductPage() {
