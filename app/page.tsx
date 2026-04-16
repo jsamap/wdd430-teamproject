@@ -9,6 +9,7 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import Image from 'next/image';
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import ReviewRating from './ui/reviews/ReviewRating';
 
 
 export default async function Page() {
@@ -45,6 +46,7 @@ export default async function Page() {
                 price={product.price}
                 image={product.image}
                 rating={product.rating_average}
+                ratingCount={product.rating_count}
               />
             ))}
           </div>
@@ -72,13 +74,9 @@ export default async function Page() {
                 <p className="text-gray-700 italic">"{review.comment}"</p>
 
                 <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      className={`h-5 w-5 ${i < Math.round(review.rating) ? "text-[#FCB33D]" : "text-gray-300"}`}
-                    />
-                  ))}
-                  <span className="ml-2 text-sm text-gray-600">{review.rating}</span>
+                  <div className="font-bold text-[#FCB33D]">
+                    <ReviewRating rating={review.rating}/>
+                  </div>
                 </div>
 
                 <p className="text-sm text-gray-500">— {review.reviewer_name}</p>

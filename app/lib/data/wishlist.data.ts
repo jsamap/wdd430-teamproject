@@ -11,6 +11,7 @@ export async function getProductsInWishlist(id: string) {
                 p.price,
                 p.image,
                 p.rating_average,
+                p.rating_count,
                 p.details
             FROM wishlist w
             INNER JOIN users u 

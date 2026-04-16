@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { StarIcon as StarOutline } from "@heroicons/react/24/outline";
 import { useSession } from "next-auth/react";
+import ReviewRating from "../reviews/ReviewRating";
 
 interface ProductCardProps {
   id: string;
@@ -15,9 +16,10 @@ interface ProductCardProps {
   price: number;
   image: string;
   rating: number;
+  ratingCount: number;
 }
 
-export default function ProductCard({ id, name, seller, price, image, rating }: ProductCardProps) {
+export default function ProductCard({ id, name, seller, price, image, rating, ratingCount }: ProductCardProps) {
   const { data: session } = useSession();
   const [wishlisted, setWishlisted] = useState(false);
 
@@ -99,13 +101,16 @@ export default function ProductCard({ id, name, seller, price, image, rating }: 
         <p className="text-gray-600">${price.toFixed(2)}</p>
       </div>
       <div className="mb-2 flex justify-center">
-        {[...Array(5)].map((_, i) =>
+        {/* {[...Array(5)].map((_, i) =>
           i < Math.round(rating) ? (
             <StarIcon key={i} className="h-5 w-5 text-[#FCB33D]" />
           ) : (
             <StarOutline key={i} className="h-5 w-5 text-gray-300" />
           )
-        )}
+        )} */}
+        <div className="font-bold text-[#FCB33D]">
+          <ReviewRating rating={rating} count={ratingCount} />
+        </div>
       </div>
 
       <div className="mt-4">
