@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import ProductForm from "../../../../ui/components/products/ProductForm";
-import { Product, ProductFormData } from "@/lib/types";
+import { Product, ProductFormData } from "@/app/lib/types";
 
 export default function EditProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
