@@ -1,8 +1,10 @@
-export default function Page() {
-  return (
-      <main className="flex min-h-screen flex-col p-6">
-        <h1 className="text-2xl font-bold mb-4">User Show</h1>
-        <p>This is the user profile page.</p>
-      </main>
-  );
+import { redirect } from "next/navigation";
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  redirect(`/admin/users/edit/${id}`);
 }

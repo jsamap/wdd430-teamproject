@@ -2,7 +2,24 @@
 
 import Link from "next/link";
 
-export default function ProductTable({ products, onDelete }: any) {
+type Product = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  image?: string | null;
+};
+
+type ProductTableProps = {
+  products: Product[];
+  onDelete: (id: string) => void;
+};
+
+export default function ProductTable({
+  products,
+  onDelete,
+}: ProductTableProps) {
   if (!products || products.length === 0) {
     return (
       <div className="rounded-2xl border bg-white p-6 shadow-sm">
@@ -21,13 +38,12 @@ export default function ProductTable({ products, onDelete }: any) {
             <th className="p-4">Category</th>
             <th className="p-4">Price</th>
             <th className="p-4">Stock</th>
-            <th className="p-4">Status</th>
             <th className="p-4">Actions</th>
           </tr>
         </thead>
 
         <tbody>
-          {products.map((product: any) => (
+          {products.map((product) => (
             <tr key={product.id} className="border-t">
               <td className="p-4">
                 {product.image ? (
@@ -45,7 +61,6 @@ export default function ProductTable({ products, onDelete }: any) {
               <td className="p-4">{product.category}</td>
               <td className="p-4">${product.price}</td>
               <td className="p-4">{product.stock}</td>
-              <td className="p-4">{product.status}</td>
               <td className="p-4">
                 <div className="flex gap-3">
                   <Link
